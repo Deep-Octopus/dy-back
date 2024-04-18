@@ -1,0 +1,71 @@
+<!--
+ * @Author: 夏2同学
+ * @Date: 2020-07-15 22:06:32
+ * @LastEditTime: 2020-07-18 13:17:27
+ * @LastEditors: 夏2同学
+ * @FilePath: \学习JavaScript\index.html
+ * @Description:
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+    </script>
+</head>
+<body>
+<div>
+    选择文件(可多选):
+    <input type="file" id="f1" multiple /><br /><br />
+    <button type="button" id="btn-submit">上 传</button>
+</div>
+<script>
+    function submitUpload() {
+        //获得文件列表，注意这里不是数组，而是对象
+        var fileList = document.getElementById('f1').files;
+        if (!fileList.length) {
+            alert('请选择文件');
+            return;
+        }
+        var file = new FormData(); //构造FormData对象
+        // file.append('title', document.getElementById('title').value);
+
+        //多文件上传需要遍历添加到 fromdata 对象
+        for (var i = 0; i < fileList.length; i++) {
+            file.append('file', fileList[i]); //支持多文件上传
+        }
+
+
+        for (var value of file.values()) {
+            console.log(value);
+        }
+
+        var xhr = new XMLHttpRequest(); //创建对象
+
+        xhr.open("POST", "http://111.230.33.57:8082/file/uploadFile");
+        // xhr.setRequestHeader("Content-Type", "multipart/form-data");
+        xhr.setRequestHeader("Authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3MDY3Nzk0NDcsImlzcyI6Ik9jdG9wdXMifQ.ag1syS_fGnjT56IFoS_hUPWTmuWVt_M07zLB3VCOZp8");
+        xhr.setRequestHeader("Id","1");
+
+        xhr.send(file); //发送时  Content-Type默认就是: multipart/form-data;
+
+        xhr.onreadystatechange = function() {
+            console.log('state change', xhr.readyState);
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse(xhr.responseText); //返回值
+                console.log(obj);
+                if (obj.data) {
+                    alert('上传成功');
+                }
+            }
+        }
+
+    }
+
+    //绑定提交事件
+    document.getElementById('btn-submit').addEventListener('click', submitUpload);
+</script>
+</body>
+</html>
